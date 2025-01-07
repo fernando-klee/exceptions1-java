@@ -1,6 +1,7 @@
 package application;
 
 import model.entities.Reservation;
+import model.exceptions.DomainException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -13,17 +14,16 @@ public class Program {
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        System.out.print("Room number: ");
-        int number = scanner.nextInt();
-        System.out.print("Check-in date (DD/MM/YYYY): ");
-        LocalDate checkIn = LocalDate.parse(scanner.next(), fmt);
+        try {
+            System.out.print("Room number: ");
+            int number = scanner.nextInt();
+            System.out.print("Check-in date (DD/MM/YYYY): ");
+            LocalDate checkIn = LocalDate.parse(scanner.next(), fmt);
 
-        System.out.print("Check-out date (DD/MM/YYYY): ");
-        LocalDate checkOut = LocalDate.parse(scanner.next(), fmt);
+            System.out.print("Check-out date (DD/MM/YYYY): ");
+            LocalDate checkOut = LocalDate.parse(scanner.next(), fmt);
 
-        if (!checkOut.isAfter(checkIn)) {
-            System.out.println("Error in reservation: Check-out date must be after Check-in date!");
-        } else {
+
             Reservation reservation = new Reservation(number, checkIn, checkOut);
             System.out.println("Reservation: " + reservation);
 
@@ -35,13 +35,14 @@ public class Program {
             checkOut = LocalDate.parse(scanner.next(), fmt);
 
 
-            String error = reservation.updateDates(checkIn, checkOut);
-            if (error != null) {
-                System.out.println("Error in reservation: " + error);
-            } else {
-                System.out.println("Reservation: " + reservation);
-            }
+            reservation.updateDates(checkIn, checkOut);
+            System.out.println("Reservation: " + reservation);
+        } catch (DomainException  e) {
+            System.out.println("Error in reservation " + e.getMessage());
+        } catch (RuntimeException e) {
+            System.out.println("Unexpected error");
         }
+
         scanner.close();
     }
 }
